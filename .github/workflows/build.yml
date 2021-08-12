@@ -1,0 +1,44 @@
+name: Datacore Assignment
+
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out repository under $GITHUB_WORKSPACE, so the job can access it
+      - uses: actions/checkout@v2
+
+      - name: Get Current Pull Request
+        uses: 8BitJonny/gh-get-current-pr@1.0.1
+        id: pr
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          filterOutClosed: true
+
+      - id: file_changes
+        name: File Changes
+        uses: trilom/file-changes-action@v1.2.3
+        with:
+          prNumber: ${{ steps.pr.outputs.number }}
+          pushBefore: ''
+          pushAfter: ''
+
+      - name: Ouput File Changes
+        run: echo '${{ steps.file_changes.outputs.files }}'
+
+      # Runs a single command using the runners shell
+      - name: Run go "build"
+        if: contains(steps.file_changes.outputs.files , '"go/')
+        run: make
+
+      - name: Run python "build"
+        if: contains(steps.file_changes.outputs.files , '"python/')
+        run: make
