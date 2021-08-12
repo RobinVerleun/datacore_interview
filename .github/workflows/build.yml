@@ -37,8 +37,8 @@ jobs:
       # Runs a single command using the runners shell
       - name: Run go "build"
         if: contains(steps.file_changes.outputs.files , '"go/')
-        run: make
+        run: make go/Makefile
 
       - name: Run python "build"
         if: contains(steps.file_changes.outputs.files , '"python/')
-        run: make
+        run: make python/Makefile
